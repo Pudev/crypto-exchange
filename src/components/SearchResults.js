@@ -14,20 +14,6 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
-// function createData(exchange, price) {
-//   return {
-//     exchange,
-//     price,
-//   };
-// }
-
-// const rows = [
-//   createData("Binance", 20000),
-//   createData("Kraken", 19999),
-//   createData("Huobi", 20100),
-//   createData("Bitfinex", 20500),
-// ];
-
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -101,7 +87,9 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-const EnhancedTableToolbar = () => {
+const EnhancedTableToolbar = (props) => {
+  const { search } = props;
+
   return (
     <Toolbar
       sx={{
@@ -115,18 +103,18 @@ const EnhancedTableToolbar = () => {
         id="tableTitle"
         component="div"
       >
-        BTCUSD
+        {search}
       </Typography>
     </Toolbar>
   );
 };
 
-EnhancedTableToolbar.propTypes = {};
+// EnhancedTableToolbar.propTypes = {};
 
 export default function EnhancedTable(props) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("exchange");
-  const { searchResult } = props;
+  const { searchResult, search } = props;
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -137,6 +125,7 @@ export default function EnhancedTable(props) {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
+        <EnhancedTableToolbar search={search}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}

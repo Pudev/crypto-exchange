@@ -39,7 +39,7 @@ export const fetchBitfinexData = async () => {
 
 export const fetchKraken = async (symbol) => {
   const { data } = await axios.get(
-    `https://api.kraken.com/0/public/Ticker?pair=${symbol}`
+    `https://api.kraken.com/0/public/Ticker?pair=${symbol.toUpperCase()}`
   );
 
   if (data.error.length > 0) {
@@ -60,7 +60,7 @@ export const fetchKraken = async (symbol) => {
 
 export const fetchHuobi = async (symbol) => {
   const { data } = await axios.get(
-    `https://api.huobi.pro/market/detail/merged?symbol=${symbol}`
+    `https://api.huobi.pro/market/detail/merged?symbol=${symbol.toLowerCase()}`
   );
 
   if (data.status === "error") {

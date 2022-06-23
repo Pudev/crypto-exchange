@@ -16,17 +16,15 @@ import {
 //      the pair string: `http://url.com/{cryptocurrency_pair}/`,
 //      and opening the detail view on a pair by `http://url.com/{cryptocurrency_pair}/details`
 
-// + Loading
-
 // BONUS:
 // + While staying on the results page, update the market prices automatically in a reasonable time intervals.
 
 // TODO:
 // handle error when the api are throwing errors
 // extract constant of the Exchanges
-// extract base-api file
 
 const App = () => {
+  const [search, setSearch] = useState('');
   const [searchResult, setSearchResult] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,6 +45,7 @@ const App = () => {
     const removeCryptoPairSlash = value.replace("/", "");
     const res = await fetchPriceData(removeCryptoPairSlash);
     setSearchResult([...res]);
+    setSearch(removeCryptoPairSlash.toUpperCase());
   };
 
   return (
@@ -60,7 +59,7 @@ const App = () => {
           <CircularProgress color="inherit" />
         </Backdrop>
       )}
-      <SearchResults searchResult={searchResult} />
+      <SearchResults searchResult={searchResult} search={search}/>
     </div>
   );
 };
