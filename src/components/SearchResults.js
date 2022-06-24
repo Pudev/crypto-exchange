@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-// import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -14,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
-function descendingComparator(a, b, orderBy) {
+const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -22,30 +21,26 @@ function descendingComparator(a, b, orderBy) {
     return 1;
   }
   return 0;
-}
+};
 
-function getComparator(order, orderBy) {
+const getComparator = (order, orderBy) => {
   return order === "desc"
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
-}
+};
 
 const headCells = [
   {
     id: "exchange",
-    numeric: false,
-    disablePadding: true,
     label: "Exchange",
   },
   {
     id: "price",
-    numeric: true,
-    disablePadding: false,
     label: "Price",
   },
 ];
 
-function EnhancedTableHead(props) {
+const EnhancedTableHead = (props) => {
   const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -57,7 +52,6 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            // align={headCell.numeric ? "right" : "left"}
             align={"left"}
             padding={"normal"}
             sortDirection={orderBy === headCell.id ? order : false}
@@ -79,7 +73,7 @@ function EnhancedTableHead(props) {
       </TableRow>
     </TableHead>
   );
-}
+};
 
 EnhancedTableHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
@@ -109,12 +103,10 @@ const EnhancedTableToolbar = (props) => {
   );
 };
 
-// EnhancedTableToolbar.propTypes = {};
-
-export default function EnhancedTable(props) {
+const EnhancedTable = (props) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("exchange");
-  const { searchResult, search } = props;
+  const { searchResult, search, onClickRow } = props;
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -125,7 +117,7 @@ export default function EnhancedTable(props) {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar search={search}/>
+        <EnhancedTableToolbar search={search} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -145,11 +137,10 @@ export default function EnhancedTable(props) {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => {
-                        console.log("click row");
-                      }}
+                      onClick={() => onClickRow(row.exchange)}
                       tabIndex={-1}
                       key={row.exchange}
+                      style={{ cursor: 'pointer' }}
                     >
                       <TableCell align="left">{row.exchange}</TableCell>
                       <TableCell align="left">{row.price}</TableCell>
@@ -162,4 +153,12 @@ export default function EnhancedTable(props) {
       </Paper>
     </Box>
   );
-}
+};
+
+EnhancedTable.propTypes = {
+  search: PropTypes.string.isRequired,
+  searchResult: PropTypes.array.isRequired,
+  onClickRow: PropTypes.func.isRequired,
+};
+
+export default EnhancedTable;

@@ -49,11 +49,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const SearchAppBar = (props) => {
-    
-const onSearch = (value) => {
-    props.onSearch(value);
-};
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -66,8 +61,7 @@ const onSearch = (value) => {
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
               onKeyPress={(event) => {
-                if (event.key === 'Enter')
-                    onSearch(event.target.value);
+                if (event.key === "Enter") props.onSearch(event.target.value);
               }}
             />
           </Search>

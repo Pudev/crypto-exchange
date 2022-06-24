@@ -1,29 +1,52 @@
 import axios from "axios";
+import { roundPrice } from "../utils/helper";
+import { Exchanges } from "../utils/enums";
 
-export const fetchBinanceData = async (symbol) => {
+export const getBinanceTickerData = async (symbol) => {
   try {
     const { data } = await axios.get(
       `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}`
     );
 
-    const price = parseFloat(data?.lastPrice).toFixed(4);
-
     return {
-      exchange: "Binance",
-      price: price,
+      exchange: Exchanges.Binance,
+      price: roundPrice(data.lastPrice),
     };
   } catch (error) {
     return {
-      exchange: "Binance",
+      exchange: Exchanges.Binance,
       price: "N/A",
     };
   }
 };
 
-export const fetchBitfinexData = async () => {
+export const getBinanceTradesData = async (symbol) => {
+  try {
+    const { data } = await axios.get(
+      `https://api.binance.com/api/v3/trades?symbol=${symbol.toUpperCase()}&limit=10`
+    );
+
+    const transformResult = data.map((d) => {
+      return {
+        amount: d.qty,
+        price: roundPrice(d.price),
+        direction: d.isBuyerMaker ? 'Buy' : 'Sell',
+      };
+    });
+
+    return transformResult;
+  } catch (error) {
+    // return {
+    //   exchange: Exchanges.Binance,
+    //   price: "N/A",
+    // };
+  }
+};
+
+export const getBitfinexTickerData = async (symbol) => {
   const options = {
     method: "GET",
-    url: "https://api-pub.bitfinex.com/v2/ticker/tBTCUSD",
+    url: `https://api-pub.bitfinex.com/v2/ticker/t${symbol.toUpperCase}`,
     headers: { Accept: "application/json" },
   };
 
@@ -37,42 +60,66 @@ export const fetchBitfinexData = async () => {
     });
 };
 
-export const fetchKraken = async (symbol) => {
+export const getKrakenTickerData = async (symbol) => {
   const { data } = await axios.get(
     `https://api.kraken.com/0/public/Ticker?pair=${symbol.toUpperCase()}`
   );
 
   if (data.error.length > 0) {
     return {
-      exchange: "Kraken",
+      exchange: Exchanges.Kraken,
       price: "N/A",
     };
   }
-  // obj[Object.keys(obj)[0]]
 
   const restData = data?.result[Object.keys(data?.result)[0]];
-  const price = parseFloat(restData?.l[0]).toFixed(4);
+  const lastPrice = restData?.l[0];
+  const price = roundPrice(lastPrice);
   return {
-    exchange: "Kraken",
+    exchange: Exchanges.Kraken,
     price,
   };
 };
 
-export const fetchHuobi = async (symbol) => {
+export const getKrakenTradesData = async (symbol) => {
+  const { data } = await axios.get(
+    `https://api.kraken.com/0/public/Trades?pair=${symbol.toUpperCase()}`,
+  );
+
+  if (data.error.length > 0) {
+    return {
+      exchange: Exchanges.Kraken,
+      price: "N/A",
+    };
+  }
+
+  const restData = data?.result[Object.keys(data?.result)[0]];
+
+  const transformResult = restData.map(d => {
+    return {
+      amount: 20000,
+      price: 333,
+      direction: 'Buy'
+    };
+  })
+  
+}
+
+export const getHuobiTickerData = async (symbol) => {
   const { data } = await axios.get(
     `https://api.huobi.pro/market/detail/merged?symbol=${symbol.toLowerCase()}`
   );
 
   if (data.status === "error") {
     return {
-      exchange: "Huobi",
+      exchange: Exchanges.Huobi,
       price: "N/A",
     };
   }
 
-  const price = parseFloat(data?.tick?.close).toFixed(4);
+  const price = roundPrice(data?.tick?.close);
   return {
-    exchange: "Huobi",
+    exchange: Exchanges.Huobi,
     price,
   };
 };

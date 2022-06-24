@@ -1,17 +1,22 @@
 import { useState } from "react";
-import SearchAppBar from "./components/Search";
-import SearchResults from "./components/SearchResults";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
+
+import SearchAppBar from "./components/Search";
+import SearchResults from "./components/SearchResults";
+import Modal from "./components/Modal";
+import CryptoDetails from "./components/CryptoDetails";
+
 import {
-  fetchBinanceData,
-  fetchKraken,
-  fetchHuobi,
+  getBinanceTickerData,
+  getBinanceTradesData,
+  getKrakenTickerData,
+  getHuobiTickerData,
+  getKrakenTradesData,
+  // fetchBitfinexData,
 } from "./service/exchange-api";
 
-// + when click on price view additional historical information about the last few trades (sell/buy)
-//      on that exchange, visualized in a modal window.
-
+import { Exchanges } from "./utils/enums";
 // + Initiate the search functionality by opening the application through url containing
 //      the pair string: `http://url.com/{cryptocurrency_pair}/`,
 //      and opening the detail view on a pair by `http://url.com/{cryptocurrency_pair}/details`
@@ -19,33 +24,53 @@ import {
 // BONUS:
 // + While staying on the results page, update the market prices automatically in a reasonable time intervals.
 
-// TODO:
-// handle error when the api are throwing errors
-// extract constant of the Exchanges
-
 const App = () => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCryptoDetailModal, setShowCryptoDetailModal] = useState(false);
 
-  const fetchPriceData = async (search) => {
+  const onSearch = async (value) => {
+    const removeCryptoPairSlash = value.replace("/", "");
+    const res = await getCryptoPriceData(removeCryptoPairSlash);
+    setSearchResult([...res]);
+    setSearch(removeCryptoPairSlash.toUpperCase());
+  };
+
+  const onOpenDetails = (exchange) => {
+    setShowCryptoDetailModal(true);
+    getCryptoTradesDetails(exchange, search);
+  };
+
+  const getCryptoPriceData = async (search) => {
     // not working - CORS ERROR
     // fetchBitfinexData();
     setIsLoading(true);
 
-    const binanceData = await fetchBinanceData(search);
-    const krakenData = await fetchKraken(search);
-    const huobiData = await fetchHuobi(search);
+    const binanceData = await getBinanceTickerData(search);
+    const krakenData = await getKrakenTickerData(search);
+    const huobiData = await getHuobiTickerData(search);
 
     setIsLoading(false);
     return [binanceData, krakenData, huobiData];
   };
 
-  const onSearch = async (value) => {
-    const removeCryptoPairSlash = value.replace("/", "");
-    const res = await fetchPriceData(removeCryptoPairSlash);
-    setSearchResult([...res]);
-    setSearch(removeCryptoPairSlash.toUpperCase());
+  const getCryptoTradesDetails = async (exchange, search) => {
+    let res = [];
+    switch (exchange) {
+      case Exchanges.Binance:
+        res = await getBinanceTradesData(search);
+        break;
+      case Exchanges.Kraken:
+        res = await getKrakenTradesData(search);
+        break;
+        
+      default: res = [];
+        break;
+    }
+
+    setDetails([...res]);
   };
 
   return (
@@ -59,7 +84,17 @@ const App = () => {
           <CircularProgress color="inherit" />
         </Backdrop>
       )}
-      <SearchResults searchResult={searchResult} search={search}/>
+      <SearchResults
+        searchResult={searchResult}
+        search={search}
+        onClickRow={onOpenDetails}
+      />
+      <Modal
+        open={showCryptoDetailModal}
+        onClose={() => setShowCryptoDetailModal(false)}
+      >
+        <CryptoDetails data={details} />
+      </Modal>
     </div>
   );
 };
