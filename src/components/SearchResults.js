@@ -140,7 +140,7 @@ const EnhancedTable = (props) => {
                       onClick={() => onClickRow(row.exchange)}
                       tabIndex={-1}
                       key={row.exchange}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                     >
                       <TableCell align="left">{row.exchange}</TableCell>
                       <TableCell align="left">{row.price}</TableCell>

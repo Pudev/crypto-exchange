@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Routes, Route, useSearchParams } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Backdrop from "@mui/material/Backdrop";
 
@@ -13,7 +14,7 @@ import {
   getKrakenTickerData,
   getKrakenTradesData,
   getHuobiTickerData,
-  getHuobiTradesData
+  getHuobiTradesData,
   // fetchBitfinexData,
 } from "./service/exchange-api";
 
@@ -26,33 +27,40 @@ import { Exchanges } from "./utils/enums";
 // + While staying on the results page, update the market prices automatically in a reasonable time intervals.
 
 const App = () => {
-  const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCryptoDetailModal, setShowCryptoDetailModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (!!searchParams.get("search")) {
+      onSearch(searchParams.get('search'));
+    }
+  }, []);
 
   const onSearch = async (value) => {
     const removeCryptoPairSlash = value.replace("/", "");
     const res = await getCryptoPriceData(removeCryptoPairSlash);
     setSearchResult([...res]);
-    setSearch(removeCryptoPairSlash.toUpperCase());
+    // setSearch(removeCryptoPairSlash.toUpperCase());
+    setSearchParams({ search: removeCryptoPairSlash.toUpperCase() });
   };
 
   const onOpenDetails = (exchange) => {
     setIsLoading(true);
 
-    getCryptoTradesDetails(exchange, search);
+    getCryptoTradesDetails(exchange, searchParams.get('search'));
 
     setIsLoading(false);
     setShowCryptoDetailModal(true);
   };
 
   const getCryptoPriceData = async (search) => {
-    // not working - CORS ERROR
-    // fetchBitfinexData();
     setIsLoading(true);
 
+    // CORS ERROR
+    // fetchBitfinexData();
     const binanceData = await getBinanceTickerData(search);
     const krakenData = await getKrakenTickerData(search);
     const huobiData = await getHuobiTickerData(search);
@@ -94,7 +102,7 @@ const App = () => {
       )}
       <SearchResults
         searchResult={searchResult}
-        search={search}
+        search={searchParams.get('search')}
         onClickRow={onOpenDetails}
       />
       <Modal
