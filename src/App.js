@@ -11,8 +11,9 @@ import {
   getBinanceTickerData,
   getBinanceTradesData,
   getKrakenTickerData,
-  getHuobiTickerData,
   getKrakenTradesData,
+  getHuobiTickerData,
+  getHuobiTradesData
   // fetchBitfinexData,
 } from "./service/exchange-api";
 
@@ -39,8 +40,12 @@ const App = () => {
   };
 
   const onOpenDetails = (exchange) => {
-    setShowCryptoDetailModal(true);
+    setIsLoading(true);
+
     getCryptoTradesDetails(exchange, search);
+
+    setIsLoading(false);
+    setShowCryptoDetailModal(true);
   };
 
   const getCryptoPriceData = async (search) => {
@@ -65,8 +70,11 @@ const App = () => {
       case Exchanges.Kraken:
         res = await getKrakenTradesData(search);
         break;
-        
-      default: res = [];
+      case Exchanges.Huobi:
+        res = await getHuobiTradesData(search);
+        break;
+      default:
+        res = [];
         break;
     }
 

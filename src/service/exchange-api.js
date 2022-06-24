@@ -30,19 +30,17 @@ export const getBinanceTradesData = async (symbol) => {
       return {
         amount: d.qty,
         price: roundPrice(d.price),
-        direction: d.isBuyerMaker ? 'Buy' : 'Sell',
+        direction: d.isBuyerMaker ? "Buy" : "Sell",
       };
     });
 
     return transformResult;
   } catch (error) {
-    // return {
-    //   exchange: Exchanges.Binance,
-    //   price: "N/A",
-    // };
+    return [];
   }
 };
 
+// CORS issue
 export const getBitfinexTickerData = async (symbol) => {
   const options = {
     method: "GET",
@@ -81,29 +79,33 @@ export const getKrakenTickerData = async (symbol) => {
   };
 };
 
+// CORS issue
 export const getKrakenTradesData = async (symbol) => {
-  const { data } = await axios.get(
-    `https://api.kraken.com/0/public/Trades?pair=${symbol.toUpperCase()}`,
-  );
-
-  if (data.error.length > 0) {
-    return {
-      exchange: Exchanges.Kraken,
-      price: "N/A",
-    };
-  }
-
-  const restData = data?.result[Object.keys(data?.result)[0]];
-
-  const transformResult = restData.map(d => {
-    return {
-      amount: 20000,
-      price: 333,
-      direction: 'Buy'
-    };
-  })
+  try {
+    const { data } = await axios.get(
+      `https://api.kraken.com/0/public/Trades?pair=${symbol.toUpperCase()}`
+    );
   
-}
+    if (data.error.length > 0) {
+      return [];
+    }
+  
+    const restData = data?.result[Object.keys(data?.result)[0]];
+  
+    const transformResult = restData.map((d) => {
+      const [price, amount, time, direction, ...rest] = d;
+      return {
+        amount: amount,
+        price: roundPrice(price),
+        direction: direction === "b" ? "Buy" : "Sell",
+      };
+    });
+  
+    return transformResult;
+  } catch (error) {
+    return [];
+  }
+};
 
 export const getHuobiTickerData = async (symbol) => {
   const { data } = await axios.get(
@@ -122,4 +124,27 @@ export const getHuobiTickerData = async (symbol) => {
     exchange: Exchanges.Huobi,
     price,
   };
+};
+
+export const getHuobiTradesData = async (symbol) => {
+  const { data } = await axios.get(
+    `https://api.huobi.pro/market/history/trade?symbol=${symbol.toLowerCase()}&size=10`
+  );
+
+  if (data.status === "error") {
+    return [];
+  }
+  const restData = data.data;
+
+  const transformResult = restData.map((d) => {
+    const [details] = d.data;
+    const { amount, direction, price } = details;
+    return {
+      amount: amount,
+      price: roundPrice(price),
+      direction: direction === "buy" ? "Buy" : "Sell",
+    };
+  });
+
+  return transformResult;
 };
