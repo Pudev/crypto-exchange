@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -50,7 +49,7 @@ const CryptoTrades = ({ exchange, search }) => {
     getCryptoTrades(exchange, search);
 
     setShowLoading(false);
-  }, []);
+  }, [exchange, search]);
 
   return (
     <>

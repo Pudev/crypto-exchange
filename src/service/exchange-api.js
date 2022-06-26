@@ -20,6 +20,18 @@ export const getBinanceTickerData = async (symbol) => {
   }
 };
 
+export const getBinanceTickerDetailsData = async (symbol) => {
+  try {
+    const { data } = await axios.get(
+      `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}`
+    );
+
+    return data;
+  } catch (error) {
+    return {};
+  }
+};
+
 export const getBinanceTradesData = async (symbol) => {
   try {
     const { data } = await axios.get(
@@ -85,13 +97,13 @@ export const getKrakenTradesData = async (symbol) => {
     const { data } = await axios.get(
       `https://api.kraken.com/0/public/Trades?pair=${symbol.toUpperCase()}`
     );
-  
+
     if (data.error.length > 0) {
       return [];
     }
-  
+
     const restData = data?.result[Object.keys(data?.result)[0]];
-  
+
     const transformResult = restData.map((d) => {
       const [price, amount, time, direction, ...rest] = d;
       return {
@@ -100,7 +112,7 @@ export const getKrakenTradesData = async (symbol) => {
         direction: direction === "b" ? "Buy" : "Sell",
       };
     });
-  
+
     return transformResult;
   } catch (error) {
     return [];

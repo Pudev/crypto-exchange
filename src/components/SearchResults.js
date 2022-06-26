@@ -123,6 +123,7 @@ const EnhancedTable = () => {
 
   useEffect(() => {
     initData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
 
   const handleRequestSort = (event, property) => {
