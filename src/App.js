@@ -4,9 +4,6 @@ import SearchResults from "./components/SearchResults";
 import SearchAppBar from "./components/Search";
 import CryptoDetails from "./components/CryptoDetails";
 
-// BONUS:
-// + While staying on the results page, update the market prices automatically in a reasonable time intervals.
-
 const App = () => {
   return (
     <>

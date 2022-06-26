@@ -103,25 +103,29 @@ const EnhancedTable = () => {
   const { search } = useParams();
 
   const getCryptoPriceData = async (search) => {
-    setShowLoading(true);
-
     // CORS ERROR
     // fetchBitfinexData();
     const binanceData = await getBinanceTickerData(search);
     const krakenData = await getKrakenTickerData(search);
     const huobiData = await getHuobiTickerData(search);
 
-    setShowLoading(false);
     return [binanceData, krakenData, huobiData];
   };
 
-  const initData = async () => {
+  const initData = async (loading = true) => {
     const removeCryptoPairSlash = search.replace("/", "");
+
+    if (loading) setShowLoading(true);
+
     const res = await getCryptoPriceData(removeCryptoPairSlash);
+
+    setShowLoading(false);
     setSearchResult([...res]);
   };
 
-  const refresh = setInterval(initData, 5000);
+  const refresh = setInterval(() => {
+    initData(false);
+  }, 5000);
 
   useEffect(() => {
     initData();
