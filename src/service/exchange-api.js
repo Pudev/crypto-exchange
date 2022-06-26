@@ -105,6 +105,7 @@ export const getKrakenTradesData = async (symbol) => {
     const restData = data?.result[Object.keys(data?.result)[0]];
 
     const transformResult = restData.map((d) => {
+      // eslint-disable-next-line no-unused-vars
       const [price, amount, time, direction, ...rest] = d;
       return {
         amount: amount,

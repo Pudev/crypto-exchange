@@ -121,10 +121,18 @@ const EnhancedTable = () => {
     setSearchResult([...res]);
   };
 
+  const refresh = setInterval(initData, 5000);
+
   useEffect(() => {
     initData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search]);
+
+  useEffect(() => {
+    return function cleanup() {
+      clearInterval(refresh);
+    };
+  });
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -179,7 +187,7 @@ const EnhancedTable = () => {
       >
         <CryptoTrades exchange={exchange} search={search} />
       </Modal>
-      <Loading show={showLoading}/>
+      <Loading show={showLoading} />
     </>
   );
 };
