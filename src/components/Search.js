@@ -1,10 +1,13 @@
 import * as React from "react";
+import { Outlet } from "react-router-dom"
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+
+import { useNavigate } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -49,6 +52,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const SearchAppBar = (props) => {
+  let navigate = useNavigate();
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -61,12 +66,15 @@ const SearchAppBar = (props) => {
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
               onKeyPress={(event) => {
-                if (event.key === "Enter") props.onSearch(event.target.value);
+                if (event.key === "Enter") {
+                  navigate(`../${event.target.value}`);
+                }
               }}
             />
           </Search>
         </Toolbar>
       </AppBar>
+      <Outlet />
     </Box>
   );
 };

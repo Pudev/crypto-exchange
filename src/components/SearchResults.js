@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -12,6 +14,14 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
+
+
+import {
+  getBinanceTickerData,
+  getKrakenTickerData,
+  getHuobiTickerData,
+  // fetchBitfinexData,
+} from "../service/exchange-api";
 
 const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -106,7 +116,32 @@ const EnhancedTableToolbar = (props) => {
 const EnhancedTable = (props) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("exchange");
-  const { searchResult, search, onClickRow } = props;
+  const [searchResult, setSearchResult] = useState([]);
+
+  const { search } = useParams();
+
+  const getCryptoPriceData = async (search) => {
+    // setIsLoading(true);
+
+    // CORS ERROR
+    // fetchBitfinexData();
+    const binanceData = await getBinanceTickerData(search);
+    const krakenData = await getKrakenTickerData(search);
+    const huobiData = await getHuobiTickerData(search);
+
+    // setIsLoading(false);
+    return [binanceData, krakenData, huobiData];
+  };
+
+  const initData = async () => {
+    const removeCryptoPairSlash = search.replace("/", "");
+    const res = await getCryptoPriceData(removeCryptoPairSlash);
+    setSearchResult([...res]);
+  };
+
+  useEffect(() => {
+    initData();
+  }, [search]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -137,7 +172,9 @@ const EnhancedTable = (props) => {
                   return (
                     <TableRow
                       hover
-                      onClick={() => onClickRow(row.exchange)}
+                      onClick={() => {
+                        // set history to /asdjfas/details
+                      }}
                       tabIndex={-1}
                       key={row.exchange}
                       style={{ cursor: "pointer" }}
@@ -153,12 +190,6 @@ const EnhancedTable = (props) => {
       </Paper>
     </Box>
   );
-};
-
-EnhancedTable.propTypes = {
-  search: PropTypes.string.isRequired,
-  searchResult: PropTypes.array.isRequired,
-  onClickRow: PropTypes.func.isRequired,
 };
 
 export default EnhancedTable;

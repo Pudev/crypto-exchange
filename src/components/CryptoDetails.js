@@ -1,4 +1,6 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,8 +10,47 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import PropTypes from "prop-types";
 
-const CryptoDetails = (props) => {
-  const { data } = props;
+import {
+  getBinanceTradesData,
+  getKrakenTradesData,
+  getHuobiTradesData,
+} from "../service/exchange-api";
+
+import { Exchanges } from "../utils/enums";
+
+const CryptoDetails = () => {
+  const { search } = useParams();
+
+  const [data, setData] = useState([]);
+
+  const getCryptoTradesDetails = async (exchange, search) => {
+    let res = [];
+    switch (exchange) {
+      case Exchanges.Binance:
+        res = await getBinanceTradesData(search);
+        break;
+      case Exchanges.Kraken:
+        res = await getKrakenTradesData(search);
+        break;
+      case Exchanges.Huobi:
+        res = await getHuobiTradesData(search);
+        break;
+      default:
+        res = [];
+        break;
+    }
+
+    setData([...res]);
+  };
+  useEffect(() => {
+    // setIsLoading(true);
+    
+    // TODO: Exhange ????
+    getCryptoTradesDetails('Binance', search);
+    
+    // setIsLoading(false);
+    // setShowCryptoDetailModal(true);
+  }, []);
 
   return (
     <TableContainer component={Paper}>
@@ -27,13 +68,9 @@ const CryptoDetails = (props) => {
               key={index}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              {/* <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell> */}
               <TableCell>{row.amount}</TableCell>
               <TableCell>{row.price}</TableCell>
               <TableCell>{row.direction}</TableCell>
-              {/* <TableCell align="right">{row.protein}</TableCell> */}
             </TableRow>
           ))}
         </TableBody>
