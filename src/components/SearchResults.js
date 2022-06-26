@@ -14,7 +14,8 @@ import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
 import Modal from "../components/Modal";
-import CryptoDetails from "../components/CryptoDetails";
+import CryptoTrades from "./CryptoTrades";
+import Loading from "../components/Loading";
 
 import {
   getBinanceTickerData,
@@ -91,17 +92,18 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-const EnhancedTable = (props) => {
+const EnhancedTable = () => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("exchange");
   const [searchResult, setSearchResult] = useState([]);
   const [showCryptoDetailModal, setShowCryptoDetailModal] = useState(false);
   const [exchange, setExchange] = useState();
+  const [showLoading, setShowLoading] = useState(false);
 
   const { search } = useParams();
 
   const getCryptoPriceData = async (search) => {
-    // setIsLoading(true);
+    setShowLoading(true);
 
     // CORS ERROR
     // fetchBitfinexData();
@@ -109,7 +111,7 @@ const EnhancedTable = (props) => {
     const krakenData = await getKrakenTickerData(search);
     const huobiData = await getHuobiTickerData(search);
 
-    // setIsLoading(false);
+    setShowLoading(false);
     return [binanceData, krakenData, huobiData];
   };
 
@@ -119,7 +121,6 @@ const EnhancedTable = (props) => {
     setSearchResult([...res]);
   };
 
-  // TODO: fix rendering too many times
   useEffect(() => {
     initData();
   }, [search]);
@@ -175,8 +176,9 @@ const EnhancedTable = (props) => {
         open={showCryptoDetailModal}
         onClose={() => setShowCryptoDetailModal(false)}
       >
-        <CryptoDetails exchange={exchange} search={search}/>
+        <CryptoTrades exchange={exchange} search={search} />
       </Modal>
+      <Loading show={showLoading}/>
     </>
   );
 };
