@@ -10,11 +10,11 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
+import Modal from "../components/Modal";
+import CryptoDetails from "../components/CryptoDetails";
 
 import {
   getBinanceTickerData,
@@ -91,32 +91,12 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-const EnhancedTableToolbar = (props) => {
-  const { search } = props;
-
-  return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-      }}
-    >
-      <Typography
-        sx={{ flex: "1 1 100%" }}
-        variant="h6"
-        id="tableTitle"
-        component="div"
-      >
-        {search}
-      </Typography>
-    </Toolbar>
-  );
-};
-
 const EnhancedTable = (props) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("exchange");
   const [searchResult, setSearchResult] = useState([]);
+  const [showCryptoDetailModal, setShowCryptoDetailModal] = useState(false);
+  const [exchange, setExchange] = useState();
 
   const { search } = useParams();
 
@@ -139,6 +119,7 @@ const EnhancedTable = (props) => {
     setSearchResult([...res]);
   };
 
+  // TODO: fix rendering too many times
   useEffect(() => {
     initData();
   }, [search]);
@@ -150,45 +131,53 @@ const EnhancedTable = (props) => {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar search={search} />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={"medium"}
-          >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-            />
-            <TableBody>
-              {searchResult
-                .slice()
-                .sort(getComparator(order, orderBy))
-                .map((row, index) => {
-                  return (
-                    <TableRow
-                      hover
-                      onClick={() => {
-                        // set history to /asdjfas/details
-                      }}
-                      tabIndex={-1}
-                      key={row.exchange}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <TableCell align="left">{row.exchange}</TableCell>
-                      <TableCell align="left">{row.price}</TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Box>
+    <>
+      <Box sx={{ width: "100%" }}>
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={"medium"}
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+              />
+              <TableBody>
+                {searchResult
+                  .slice()
+                  .sort(getComparator(order, orderBy))
+                  .map((row, index) => {
+                    return (
+                      <TableRow
+                        hover
+                        onClick={() => {
+                          setExchange(row.exchange);
+                          setShowCryptoDetailModal(true);
+                        }}
+                        tabIndex={-1}
+                        key={row.exchange}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <TableCell align="left">{row.exchange}</TableCell>
+                        <TableCell align="left">{row.price}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Box>
+      <Modal
+        open={showCryptoDetailModal}
+        onClose={() => setShowCryptoDetailModal(false)}
+      >
+        <CryptoDetails exchange={exchange} search={search}/>
+      </Modal>
+    </>
   );
 };
 

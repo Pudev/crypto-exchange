@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom"
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -7,7 +7,7 @@ import Toolbar from "@mui/material/Toolbar";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -51,8 +51,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const SearchAppBar = (props) => {
-  let navigate = useNavigate();
+const SearchAppBar = () => {
+  const navigate = useNavigate();
+  const { search } = useParams();
+  const [searchInput, setSearchInput] = useState(search);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -65,9 +67,11 @@ const SearchAppBar = (props) => {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ "aria-label": "search" }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               onKeyPress={(event) => {
                 if (event.key === "Enter") {
-                  navigate(`../${event.target.value}`);
+                  navigate(`/${event.target.value}`);
                 }
               }}
             />

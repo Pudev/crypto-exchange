@@ -6,8 +6,6 @@ import Backdrop from "@mui/material/Backdrop";
 import SearchResults from "./components/SearchResults";
 import SearchAppBar from "./components/Search";
 
-import Modal from "./components/Modal";
-import CryptoDetails from "./components/CryptoDetails";
 
 // + Initiate the search functionality by opening the application through url containing
 //      the pair string: `http://url.com/{cryptocurrency_pair}/`,
@@ -18,36 +16,24 @@ import CryptoDetails from "./components/CryptoDetails";
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [showCryptoDetailModal, setShowCryptoDetailModal] = useState(false);
 
   const Details = () => {
-    useEffect(() => {}, []);
-
-    return (
-      <Modal
-        open={showCryptoDetailModal}
-        onClose={() => setShowCryptoDetailModal(false)}
-      >
-        <CryptoDetails />
-      </Modal>
-    );
+    return <div>Details page</div>;
   };
 
   const Results = () => {
     // Loading should be set in store
     return (
       <>
-        {isLoading && (
-          <Backdrop
-            sx={{
-              color: "#0c3b69",
-              zIndex: (theme) => theme.zIndex.drawer + 1,
-            }}
-            open={isLoading}
-          >
-            <CircularProgress color="inherit" />
-          </Backdrop>
-        )}
+        <Backdrop
+          sx={{
+            color: "#0c3b69",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+          }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <SearchResults />
       </>
     );

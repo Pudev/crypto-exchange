@@ -18,9 +18,8 @@ import {
 
 import { Exchanges } from "../utils/enums";
 
-const CryptoDetails = () => {
-  const { search } = useParams();
-
+const CryptoDetails = (props) => {
+  const { exchange, search } = props;
   const [data, setData] = useState([]);
 
   const getCryptoTradesDetails = async (exchange, search) => {
@@ -42,11 +41,12 @@ const CryptoDetails = () => {
 
     setData([...res]);
   };
+  
   useEffect(() => {
     // setIsLoading(true);
     
     // TODO: Exhange ????
-    getCryptoTradesDetails('Binance', search);
+    getCryptoTradesDetails(exchange, search);
     
     // setIsLoading(false);
     // setShowCryptoDetailModal(true);
